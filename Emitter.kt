@@ -8,4 +8,8 @@ fun main(args: Array<String>)
   println("50 + 60 = ${sum(50,60)}")
 }
 
-fun sum(a: Int , b:Int) = a + b
+/* fun sum(a: Int , b:Int) = a + b */
+
+fun sum(a: Int , b:Int): Int {
+  return a + b;
+}
