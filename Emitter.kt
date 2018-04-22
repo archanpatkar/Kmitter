@@ -1,5 +1,6 @@
 package com.archanpatkar.emitter;
 
+/* import kotlin.jvm.*; */
 import kotlin.concurrent.thread;
 
 interface Emitter
@@ -10,56 +11,8 @@ interface Emitter
 
 class EventEmitter : Emitter
 {
-  val _events = HashMap<String,ArrayList<(params:Array<Any>)-> Unit>>();
-  var _eventCount = 0
-      private set
-
-  public fun eventCount(): Int
-  {
-    return this._eventCount;
-  }
-
-  public override fun on(event:String,handler:(params:Array<Any>)-> Unit)
-  {
-    if(this._events.containsKey(event))
-    {
-      this._events.get(event)?.add(handler);
-    }
-    else
-    {
-      val _tal = ArrayList<(params:Array<Any>)-> Unit>();
-      _tal.add(handler);
-      this._events.put(event,_tal);
-    }
-  }
-
-  public override fun emit(event:String,vararg params:Any)
-  {
-    if(this._events.containsKey(event))
-    {
-        val eve = this._events.get(event);
-        this._eventCount++;
-        for(func in eve!!.iterator())
-        {
-          func.invoke(arrayOf(*params));
-        }
-    }
-  }
-}
-
-class ThreadSafeQueue;
-
-class AsyncEmitter: Emitter
-{
   private val _events = HashMap<String,ArrayList<(params:Array<Any>)-> Unit>>();
-  private val _q:ThreadSafeQueue? = null;
-  private var _workforce:Thread? = null;
-  private var _eventCount = 0;
-
-  constructor(isDaemon: Boolean = false): super()
-  {
-    this._workforce = thread(true,isDaemon) { this.eventLoop(); }
-  }
+  private var _eventCount = 0
 
   public fun eventCount(): Int
   {
@@ -92,9 +45,6 @@ class AsyncEmitter: Emitter
         }
     }
   }
-
-  private fun eventLoop(){}
-
 }
 
 fun main(args: Array<String>)
