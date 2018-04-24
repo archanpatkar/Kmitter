@@ -134,10 +134,7 @@ class AsyncEmitter: Emitter
         this._eventCount++;
         for(func in _eve!!.iterator())
         {
-          launch
-          {
-              func.invoke(arrayOf(*params));
-          }
+          func.invoke(arrayOf(*params));
         }
     }
   }
