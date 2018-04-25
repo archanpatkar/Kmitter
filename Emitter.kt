@@ -1,7 +1,7 @@
 package com.archanpatkar.emitter;
 
 import kotlin.concurrent.*;
-import kotlinx.coroutines.experimental.*;
+/* import kotlinx.coroutines.experimental.*; */
 
 
 interface Emitter
@@ -68,7 +68,17 @@ class EventEmitter : Emitter
 }
 
 
-class Event(name: String,params: Array<Any>);
+class Event
+{
+  var name:String;
+  var params:Array<Any>;
+
+  constructor(name: String,params: Array<Any>)
+  {
+    this.name = name;
+    this.params = params;
+  }
+}
 
 
 class ThreadSafeQueue
@@ -82,13 +92,15 @@ class ThreadSafeQueue
     this._lock.notify();
   }
 
-  @Synchronized fun dequeue(): Event?
+  @Synchronized fun dequeue(): Event
   {
-    if(this._ds.get(this._ds.size - 1) == null)
+    if(this._ds.size == 0)
     {
       this._lock.wait();
     }
-    val _te = this._ds.get(this._ds.size - 1);
+    val _te:Event = this._ds.get(this._ds.size - 1);
+    println("Getting Event");
+    println(_te);
     this._ds.removeAt(this._ds.size - 1);
     return _te;
   }
@@ -104,7 +116,7 @@ class AsyncEmitter: Emitter
 
   constructor(isDaemon: Boolean = false): super()
   {
-    this._workforce = thread(start = true,isDaemon = isDaemon) { this.eventLoop(); }
+    this._workforce = thread(start = true,isDaemon = isDaemon) { println("Starting the Thread"); this.eventLoop(); }
   }
 
   public fun eventCount(): Int
@@ -152,18 +164,31 @@ class AsyncEmitter: Emitter
     }
   }
 
-  private fun eventLoop(){}
-
+  private fun eventLoop()
+  {
+    while(true)
+    {
+      println("Before Async Event");
+      val e = this._q.dequeue();
+      println("Emitting Async Event");
+      this.emit(e.name,*e.params);
+    }
+  }
 }
 
 fun main(args: Array<String>)
 {
   println("Welcome to Kmitter");
-  val em1 = EventEmitter();
+  /* val em1 = EventEmitter();
   em1.on("init") { params -> params.forEach(::println) }
   em1.emit("init",10,20,30);
   em1.emit("init",100,200,300);
   em1.emit("init","Hello","Goodbye");
   println(em1.eventCount());
-  em1 emit "init"
+  em1 emit "init" */
+  val aem1 = AsyncEmitter();
+  aem1.on("init") { params -> params.forEach(::println) }
+  aem1.emit("init",10,20,30);
+  aem1.emit("init","Hello World!");
+  println("After AsyncEmitter");
 }
