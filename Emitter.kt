@@ -1,8 +1,6 @@
 package com.archanpatkar.emitter;
 
 import kotlin.concurrent.*;
-/* import kotlinx.coroutines.experimental.*; */
-
 
 interface Emitter
 {
@@ -86,23 +84,27 @@ class ThreadSafeQueue
   val _ds = ArrayList<Event>();
   val _lock = java.lang.Object();
 
-  @Synchronized fun enqueue(event: Event)
+  fun enqueue(event: Event)
   {
-    this._ds.add(event);
-    this._lock.notify();
+    synchronized(_lock)
+    {
+      this._ds.add(event);
+      this._lock.notify();
+    }
   }
 
-  @Synchronized fun dequeue(): Event
+  fun dequeue(): Event
   {
-    if(this._ds.size == 0)
+    synchronized(_lock)
     {
-      this._lock.wait();
+      if(this._ds.size == 0)
+      {
+        this._lock.wait();
+      }
+      val _te:Event = this._ds.get(0);
+      this._ds.removeAt(0);
+      return _te;
     }
-    val _te:Event = this._ds.get(this._ds.size - 1);
-    println("Getting Event");
-    println(_te);
-    this._ds.removeAt(this._ds.size - 1);
-    return _te;
   }
 
 }
@@ -111,12 +113,12 @@ class AsyncEmitter: Emitter
 {
   private val _events = HashMap<String,ArrayList<(params:Array<Any>)-> Unit>>();
   private val _q = ThreadSafeQueue();
-  private var _workforce:Thread? = null;
+  private val _workforce:Thread;
   private var _eventCount = 0;
 
   constructor(isDaemon: Boolean = false): super()
   {
-    this._workforce = thread(start = true,isDaemon = isDaemon) { println("Starting the Thread"); this.eventLoop(); }
+    this._workforce = thread(isDaemon = isDaemon) { println("Starting the Thread"); this.eventLoop(); }
   }
 
   public fun eventCount(): Int
@@ -138,7 +140,7 @@ class AsyncEmitter: Emitter
     }
   }
 
-  public fun pemit(event:String,vararg params:Any)
+  private fun pemit(event:String,vararg params:Any)
   {
     if(this._events.containsKey(event))
     {
@@ -153,25 +155,23 @@ class AsyncEmitter: Emitter
 
   public override fun emit(event:String,vararg params:Any)
   {
-    if(this._events.containsKey(event))
-    {
-        val _eve = this._events.get(event);
-        this._eventCount++;
-        for(func in _eve!!.iterator())
-        {
-          func.invoke(arrayOf(*params));
-        }
-    }
+    this._q.enqueue(Event(event,arrayOf(*params)));
   }
 
   private fun eventLoop()
   {
     while(true)
     {
-      println("Before Async Event");
       val e = this._q.dequeue();
-      println("Emitting Async Event");
-      this.emit(e.name,*e.params);
+      if(this._events.containsKey(e.name))
+      {
+          val eve = this._events.get(e.name);
+          this._eventCount++;
+          for(func in eve!!.iterator())
+          {
+            func.invoke(arrayOf(*e.params));
+          }
+      }
     }
   }
 }
