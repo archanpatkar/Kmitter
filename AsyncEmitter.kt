@@ -33,7 +33,7 @@ public class AsyncEmitter: Emitter
     }
   }
 
-  private fun pemit(event:String,vararg params:Any)
+  /* private fun pemit(event:String,vararg params:Any)
   {
     if(this._events.containsKey(event))
     {
@@ -44,7 +44,7 @@ public class AsyncEmitter: Emitter
           func.invoke(arrayOf(*params));
         }
     }
-  }
+  } */
 
   public override fun emit(event:String,vararg params:Any)
   {
