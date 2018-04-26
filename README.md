@@ -2,6 +2,8 @@
 ### Event Emitters in Kotlin
 
 ## Example
+
+#### `EventEmitter`
 ``` kotlin
 package com.archanpatkar.test;
 
@@ -9,7 +11,6 @@ import com.archanpatkar.emitter.*;
 
 fun main(args: Array<String>)
 {
-  println("Welcome to Kmitter");
   val em1 = EventEmitter();
   em1.on("init") { params -> params.forEach(::println) }
   em1.emit("init",10,20,30);
@@ -17,6 +18,17 @@ fun main(args: Array<String>)
   em1.emit("init","Hello","Goodbye");
   println(em1.eventCount());
   em1 emit "init"
+}
+```
+
+#### `AsyncEmitter`
+``` kotlin
+package com.archanpatkar.test;
+
+import com.archanpatkar.emitter.*;
+
+fun main(args: Array<String>)
+{
   val aem1 = AsyncEmitter();
   aem1.on("init") { params -> params.forEach(::println) }
   aem1.emit("init",10,20,30);
