@@ -37,22 +37,9 @@ public class EventEmitter : Emitter
     }
   }
 
-  private fun semit(event:String)
-  {
-    if(this._events.containsKey(event))
-    {
-        val eve = this._events.get(event);
-        this._eventCount++;
-        for(func in eve!!.iterator())
-        {
-          func.invoke(emptyArray<Any>());
-        }
-    }
-  }
-
   public infix fun emit(event:String)
   {
-    this.semit(event);
+    this.emit(event,emptyArray<Any>());
   }
 
 }
