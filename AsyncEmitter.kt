@@ -11,7 +11,7 @@ public class AsyncEmitter: Emitter
 
   constructor(isDaemon: Boolean = false): super()
   {
-    this._workforce = thread(isDaemon = isDaemon) { println("Starting the Thread"); this.eventLoop(); }
+    this._workforce = thread(isDaemon = isDaemon) { this.eventLoop() }
   }
 
   public fun eventCount(): Int
@@ -41,10 +41,24 @@ public class AsyncEmitter: Emitter
         this._eventCount++;
         for(func in _eve!!.iterator())
         {
+          TODO: Adding Support for Parallel Handler Execution using CoRoutines
+          func.invoke(arrayOf(*params));
+        }
+    } Starting using Co-Routines in the parallel emit!
+  } */
+
+  private fun iemit(event:String,vararg params:Any)
+  {
+    if(this._events.containsKey(event))
+    {
+        val eve = this._events.get(event);
+        this._eventCount++;
+        for(func in eve!!.iterator())
+        {
           func.invoke(arrayOf(*params));
         }
     }
-  } */
+  }
 
   public override fun emit(event:String,vararg params:Any)
   {
@@ -56,15 +70,7 @@ public class AsyncEmitter: Emitter
     while(true)
     {
       val e = this._q.dequeue();
-      if(this._events.containsKey(e.name))
-      {
-          val eve = this._events.get(e.name);
-          this._eventCount++;
-          for(func in eve!!.iterator())
-          {
-            func.invoke(arrayOf(*e.params));
-          }
-      }
+      this.iemit(e.name,*e.params)
     }
   }
 }
