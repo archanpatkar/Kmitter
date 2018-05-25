@@ -26,5 +26,6 @@ hs_err_pid*
 
 # bin folder
 bin/
+Backyard/
 
 # End of https://www.gitignore.io/api/kotlin
