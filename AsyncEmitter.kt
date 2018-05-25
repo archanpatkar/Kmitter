@@ -8,6 +8,7 @@ public class AsyncEmitter: Emitter
   private val _q = ThreadSafeQueue();
   private val _workforce:Thread;
   private var _eventCount = 0;
+  private var _listenerCount = 0;
 
   constructor(isDaemon: Boolean = false): super()
   {
@@ -33,7 +34,12 @@ public class AsyncEmitter: Emitter
     }
   }
 
-  /* private fun pemit(event:String,vararg params:Any)
+  public override fun once(event:String,handler:(params:Array<Any>)-> Unit)
+  {
+
+  }
+
+  /* private fun parallelemit(event:String,vararg params:Any)
   {
     if(this._events.containsKey(event))
     {
