@@ -44,9 +44,8 @@ public class EventEmitter : Emitter
     }
     else
     {
-      val _tal = ArrayList<FunctionWrapper>();
-      _tal.add(FunctionWrapper(handler,0));
-      this._events.put(event,_tal);
+      this.addEvent(event);
+      this._events.get(event)?.add(FunctionWrapper(handler,0));
       this._listenerCount++;
     }
     return this;
