@@ -1,6 +1,6 @@
 package com.archanpatkar.emitter;
 
-public class FunctionWrapper
+open public class FunctionWrapper
 {
   val function: (params:Array<Any>) -> Unit;
   val times: Int;
