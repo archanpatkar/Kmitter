@@ -8,6 +8,24 @@ public class EventEmitter : Emitter
   private val _regex = ArrayList<PatternWrapper>();
   private var _eventCount = 0;
   private var _listenerCount = 0;
+  private val _universal:String;
+
+  public constructor()
+  {
+    this._universal = "*";
+    this.addEvent(this._universal);
+  }
+
+  public constructor(universal:String)
+  {
+    this._universal = universal;
+    this.addEvent(this._universal);
+  }
+
+  private fun addEvent(name:String)
+  {
+    this._events.put(name,ArrayList<FunctionWrapper>());
+  }
 
   public fun eventCount(): Int
   {
@@ -70,16 +88,17 @@ public class EventEmitter : Emitter
   }
   // ***************************************************************************************************
 
+
   public override fun emit(event:String,vararg params:Any): Emitter
   {
     if(this._events.containsKey(event))
     {
-        val eve = this._events.get(event);
+        var eve = this._events.get(event);
         this._eventCount++;
         // Before
         for(func in eve!!.iterator())
         {
-          // Before
+          // Pre-Interceptors
           if(func.times == 0)
           {
             func.function.invoke(arrayOf(*params));
@@ -99,9 +118,33 @@ public class EventEmitter : Emitter
           {
             eve.remove(func);
           }
-          // After
+          // Post-Interceptors
         }
         // After
+        // Universal Handlers are to be given the LAST PRIORITY!
+        eve = this._events.get(this._universal);
+        for(func in eve!!.iterator())
+        {
+          if(func.times == 0)
+          {
+            func.function.invoke(arrayOf(*params));
+            func.count++;
+          }
+          else if(func.times == 1)
+          {
+            func.function.invoke(arrayOf(*params));
+            eve.remove(func);
+          }
+          else if(func.count < func.times)
+          {
+            func.function.invoke(arrayOf(*params));
+            func.count++;
+          }
+          else if(func.count == func.times)
+          {
+            eve.remove(func);
+          }
+        }
     }
     return this;
   }
