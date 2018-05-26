@@ -93,12 +93,13 @@ public class EventEmitter : Emitter
   {
     if(this._events.containsKey(event))
     {
+        // Before Event
         var eve = this._events.get(event);
         this._eventCount++;
-        // Before
+        // Before Normal Handlers
         for(func in eve!!.iterator())
         {
-          // Pre-Interceptors
+          // Pre-Handler-Interceptors
           if(func.times == 0)
           {
             func.function.invoke(arrayOf(*params));
@@ -118,13 +119,15 @@ public class EventEmitter : Emitter
           {
             eve.remove(func);
           }
-          // Post-Interceptors
+          // Post-Handler-Interceptors
         }
-        // After
+        // After Normal Handlers
         // Universal Handlers are to be given the LAST PRIORITY!
+        // Before Universal Handlers
         eve = this._events.get(this._universal);
         for(func in eve!!.iterator())
         {
+          // Pre-Handler-Interceptors
           if(func.times == 0)
           {
             func.function.invoke(arrayOf(*params));
@@ -144,7 +147,10 @@ public class EventEmitter : Emitter
           {
             eve.remove(func);
           }
+          // Post-Handler-Interceptors
         }
+        // After Universal Handlers
+        // After Event
     }
     return this;
   }
