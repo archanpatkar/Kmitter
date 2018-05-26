@@ -20,7 +20,7 @@ public class AsyncEmitter: Emitter
     return this._eventCount;
   }
 
-  public override fun on(event:String,handler:(params:Array<Any>)-> Unit)
+  public override fun on(event:String,handler:(params:Array<Any>)-> Unit): Emitter
   {
     if(this._events.containsKey(event))
     {
@@ -32,11 +32,7 @@ public class AsyncEmitter: Emitter
       _tal.add(handler);
       this._events.put(event,_tal);
     }
-  }
-
-  public override fun once(event:String,handler:(params:Array<Any>)-> Unit)
-  {
-
+    return this;
   }
 
   /* private fun parallelemit(event:String,vararg params:Any)
@@ -53,6 +49,10 @@ public class AsyncEmitter: Emitter
     } Starting using Co-Routines in the parallel emit!
   } */
 
+  public override fun once(event:String,handler:(params:Array<Any>)-> Unit): Emitter { return this; } // Temp
+  public override fun on(event:Regex,handler:(params:Array<Any>)-> Unit): Emitter { return this; } // Temp
+  public override fun once(event:Regex,handler:(params:Array<Any>)-> Unit): Emitter { return this; } // Temp
+
   private fun iemit(event:String,vararg params:Any)
   {
     if(this._events.containsKey(event))
@@ -66,9 +66,10 @@ public class AsyncEmitter: Emitter
     }
   }
 
-  public override fun emit(event:String,vararg params:Any)
+  public override fun emit(event:String,vararg params:Any): Emitter
   {
     this._q.enqueue(Event(event,arrayOf(*params)));
+    return this;
   }
 
   private fun eventLoop()
